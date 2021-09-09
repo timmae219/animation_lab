@@ -11,7 +11,7 @@ class MainScreen extends StatelessWidget {
       body: Center(
         child: FadeInWidget(
           child: Text(
-            '!',
+            '!', style: TextStyle(fontSize: 40),
           ),
         ),
       ),

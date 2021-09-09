@@ -1,3 +1,4 @@
+import 'dart:math' as Math;
 import 'package:flutter/cupertino.dart';
 
 class FadeInWidget extends StatefulWidget {
@@ -12,6 +13,9 @@ class FadeInWidget extends StatefulWidget {
 class _FadeInWidgetState extends State<FadeInWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  double lastRad = 0.0;
+  double maxRotation = 180;
+  double sumAngle = 0.0;
 
   @override
   void initState() {
@@ -45,7 +49,17 @@ class _FadeInWidgetState extends State<FadeInWidget>
     return 360 - (360 * animationValue);
   }
 
-  double _calcAngle(double animationValue) {
-    return (1 - animationValue) / 180;
+  // rotateZ needs rad values not degree
+  // we need the difference of the angle, between where we want to be in the current animation step (0 - 1)
+  // and where we were in the previous step
+  _calcAngle(double animationValue) {
+    var degree = animationValue * maxRotation;
+    const MAGIC_FACTOR = 2; // FIXME why this needed?
+    var degreeToRadFactor = Math.pi * MAGIC_FACTOR / 180;
+    var newRad = degree * degreeToRadFactor;
+    var returnRad = newRad - lastRad;
+    lastRad = returnRad;
+    sumAngle += returnRad;
+    return  returnRad;
   }
 }
