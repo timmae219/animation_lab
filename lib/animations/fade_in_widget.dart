@@ -2,9 +2,14 @@ import 'dart:math' as Math;
 import 'package:flutter/cupertino.dart';
 
 class FadeInWidget extends StatefulWidget {
-  const FadeInWidget({Key? key, required this.child});
+  const FadeInWidget({
+    Key? key,
+    required this.child,
+    this.rotating = false,
+  });
 
   final Widget child;
+  final bool rotating;
 
   @override
   _FadeInWidgetState createState() => _FadeInWidgetState();
@@ -21,7 +26,7 @@ class _FadeInWidgetState extends State<FadeInWidget>
   void initState() {
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 5),
+      duration: Duration(seconds: 2),
     );
     _animationController.forward();
     super.initState();
@@ -33,12 +38,18 @@ class _FadeInWidgetState extends State<FadeInWidget>
       builder: (BuildContext context, Widget? child) {
         return Transform.translate(
           offset: Offset.zero,
-          child: Transform(
-            transform: Matrix4.identity()
-              ..translate(0.0, _calcPosition(_animationController.value))
-              ..rotateZ(_calcAngle(_animationController.value)),
-            child: widget.child,
-          ),
+          child: widget.rotating
+              ? Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, _calcPosition(_animationController.value))
+                    ..rotateZ(_calcAngle(_animationController.value)),
+                  child: widget.child,
+                )
+              : Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, _calcPosition(_animationController.value)),
+                  child: widget.child,
+                ),
         );
       },
       animation: _animationController,
@@ -54,12 +65,12 @@ class _FadeInWidgetState extends State<FadeInWidget>
   // and where we were in the previous step
   _calcAngle(double animationValue) {
     var degree = animationValue * maxRotation;
-    const MAGIC_FACTOR = 2; // FIXME why this needed?
+    const MAGIC_FACTOR = 1.9995; // FIXME why this needed?
     var degreeToRadFactor = Math.pi * MAGIC_FACTOR / 180;
     var newRad = degree * degreeToRadFactor;
     var returnRad = newRad - lastRad;
     lastRad = returnRad;
     sumAngle += returnRad;
-    return  returnRad;
+    return Math.pi - returnRad;
   }
 }
